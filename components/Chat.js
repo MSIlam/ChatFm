@@ -1,19 +1,11 @@
 import { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 import { GiftedChat, Bubble } from "react-native-gifted-chat";
 import {
   collection,
-  getDocs,
   addDoc,
   onSnapshot,
   query,
-  where,
   orderBy,
 } from "firebase/firestore";
 
@@ -56,6 +48,9 @@ const Chat = ({ route, navigation, db }) => {
           createdAt: new Date(doc.data().createdAt.toMillis()),
         });
       });
+      // Sort messages by createdAt in descending order
+      // newMessages.sort((a, b) => b.createdAt - a.createdAt);
+
       setMessages(newMessages);
     });
 

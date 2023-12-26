@@ -7,8 +7,6 @@ import {
   Text,
   TextInput,
   ImageBackground,
-  KeyboardAvoidingView,
-  Platform,
   Alert,
 } from "react-native";
 
