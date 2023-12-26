@@ -1,3 +1,4 @@
+import { getAuth, signInAnonymously } from "firebase/auth";
 import { useState } from "react";
 import {
   StyleSheet,
@@ -7,15 +8,39 @@ import {
   TextInput,
   ImageBackground,
   KeyboardAvoidingView,
+  Platform,
+  Alert,
 } from "react-native";
 
 const Start = ({ navigation, backgroundImage }) => {
+  const auth = getAuth();
   const [name, setName] = useState("");
   const [color, setColor] = useState("#3498db");
+  const [error, setError] = useState(""); // New state for error message
 
-  const handleJoinChat = () => {
-    navigation.navigate("Chat", { name: name, backgroundColor: color });
+  // function for user sign in
+  const signInUser = () => {
+    if (!name.trim()) {
+      setError("Please enter a username"); // Show error if username is empty
+      return;
+    }
+
+    signInAnonymously(auth)
+      .then((result) => {
+        navigation.navigate("Chat", {
+          userID: result.user.uid,
+          // user: user,
+          name: name,
+          backgroundColor: color,
+        });
+        setError(""); // Clear the error
+        Alert.alert("Signed in Successfully!");
+      })
+      .catch((error) => {
+        Alert.alert("Unable to sign in, try later again.");
+      });
   };
+
   const handleBackgroundColor = (color) => {
     setColor(color);
   };
@@ -36,6 +61,8 @@ const Start = ({ navigation, backgroundImage }) => {
             onChangeText={setName}
             placeholder="Type your name here"
           />
+          {/* Show error message */}
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
           <View>
             <Text>Choose background color</Text>
             <View style={styles.colorContainer}>
@@ -81,16 +108,10 @@ const Start = ({ navigation, backgroundImage }) => {
               ></TouchableOpacity>
             </View>
           </View>
-          <TouchableOpacity style={styles.button} onPress={handleJoinChat}>
+          <TouchableOpacity style={styles.button} onPress={signInUser}>
             <Text style={styles.buttonText}>Join chat</Text>
           </TouchableOpacity>
         </View>
-        {Platform.OS === "android" ? (
-          <KeyboardAvoidingView behavior="height" />
-        ) : null}
-        {Platform.OS === "ios" ? (
-          <KeyboardAvoidingView behavior="padding" />
-        ) : null}
       </ImageBackground>
     </View>
   );
@@ -122,10 +143,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: "88%",
-    padding: 15,
+    padding: 10,
     borderWidth: 1,
     marginTop: 5,
-    marginBottom: 30,
+    marginBottom: 10,
     borderRadius: 5,
   },
   colorContainer: {
@@ -159,6 +180,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
   },
+  errorText: {
+    color: "red",
+    marginTop: 0,
+    marginBottom: 5,
+  },
 });
 
 export default Start;
+
+// {Platform.OS === "android" ? (
+//   <KeyboardAvoidingView behavior="height" />
+// ) : null}
+// {Platform.OS === "ios" ? (
+//   <KeyboardAvoidingView behavior="padding" />
+// ) : null}
