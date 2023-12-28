@@ -37,6 +37,7 @@ const Chat = ({ route, navigation, db, isConnected }) => {
   };
 
   let unsubMessages;
+
   useEffect(() => {
     navigation.setOptions({ title: name });
 
@@ -74,7 +75,7 @@ const Chat = ({ route, navigation, db, isConnected }) => {
 
   const loadCachedMessages = async () => {
     const cacheMessages = (await AsyncStorage.getItem("message_list")) || [];
-    setLists(JSON.parse(cacheMessages));
+    setMessages(JSON.parse(cacheMessages));
   };
 
   const cacheMessages = async (messageToCache) => {
@@ -100,6 +101,7 @@ const Chat = ({ route, navigation, db, isConnected }) => {
         renderBubble={renderBubble}
         renderInputToolbar={renderInputToolbar}
         onSend={(messages) => onSend(messages)}
+        key={Math.random()}
         user={{
           _id: userID,
           username: name,
