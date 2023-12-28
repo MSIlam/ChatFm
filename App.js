@@ -27,8 +27,6 @@ import Chat from "./components/Chat";
 const Stack = createNativeStackNavigator();
 
 const App = () => {
-  LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
-
   const connectionStatus = useNetInfo();
 
   useEffect(() => {
