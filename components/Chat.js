@@ -101,11 +101,11 @@ const Chat = ({ route, navigation, db, isConnected }) => {
         renderBubble={renderBubble}
         renderInputToolbar={renderInputToolbar}
         onSend={(messages) => onSend(messages)}
-        key={Math.random()}
         user={{
           _id: userID,
           username: name,
         }}
+        key={Math.random()}
       />
     </View>
   );
