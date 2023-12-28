@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { GiftedChat, Bubble } from "react-native-gifted-chat";
+import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 import {
   collection,
   addDoc,
@@ -9,7 +9,9 @@ import {
   orderBy,
 } from "firebase/firestore";
 
-const Chat = ({ route, navigation, db }) => {
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const Chat = ({ route, navigation, db, isConnected }) => {
   const [messages, setMessages] = useState([]);
   const { name, backgroundColor, userID } = route.params;
 
@@ -34,37 +36,69 @@ const Chat = ({ route, navigation, db }) => {
     );
   };
 
+  let unsubMessages;
   useEffect(() => {
     navigation.setOptions({ title: name });
 
-    const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+    if (isConnected === true) {
+      // unregister current onSnapshot() listener to avoid registering multiple listeners when
+      // useEffect code is re-executed.
+      if (unsubMessages) unsubMessages();
+      unsubMessages = null;
 
-    const unsubMessages = onSnapshot(q, (documentsSnapshot) => {
-      let newMessages = [];
-      documentsSnapshot.forEach((doc) => {
-        newMessages.push({
-          id: doc.id,
-          ...doc.data(),
-          createdAt: new Date(doc.data().createdAt.toMillis()),
+      const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
+
+      unsubMessages = onSnapshot(q, (documentsSnapshot) => {
+        let newMessages = [];
+        documentsSnapshot.forEach((doc) => {
+          newMessages.push({
+            id: doc.id,
+            ...doc.data(),
+            createdAt: new Date(doc.data().createdAt.toMillis()),
+          });
         });
+        // Sort messages by createdAt in descending order
+        // newMessages.sort((a, b) => b.createdAt - a.createdAt);
+        cacheMessages(newMessages);
+        setMessages(newMessages);
       });
-      // Sort messages by createdAt in descending order
-      // newMessages.sort((a, b) => b.createdAt - a.createdAt);
-
-      setMessages(newMessages);
-    });
+    } else {
+      loadCachedMessages();
+    }
 
     // Clean up code
     return () => {
       if (unsubMessages) unsubMessages();
     };
-  }, []);
+  }, [isConnected]);
+
+  const loadCachedMessages = async () => {
+    const cacheMessages = (await AsyncStorage.getItem("message_list")) || [];
+    setLists(JSON.parse(cacheMessages));
+  };
+
+  const cacheMessages = async (messageToCache) => {
+    try {
+      await AsyncStorage.setItem(
+        "message_list",
+        JSON.stringify(messageToCache)
+      );
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const renderInputToolbar = (props) => {
+    if (isConnected) return <InputToolbar {...props} />;
+    else return null;
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: backgroundColor }]}>
       <GiftedChat
         messages={messages}
         renderBubble={renderBubble}
+        renderInputToolbar={renderInputToolbar}
         onSend={(messages) => onSend(messages)}
         user={{
           _id: userID,

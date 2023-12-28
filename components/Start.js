@@ -25,6 +25,7 @@ const Start = ({ navigation, backgroundImage }) => {
 
     signInAnonymously(auth)
       .then((result) => {
+        console.log("Result from signin", result.user.uid);
         navigation.navigate("Chat", {
           userID: result.user.uid,
           // user: user,
