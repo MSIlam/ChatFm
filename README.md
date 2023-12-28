@@ -6,3 +6,5 @@
 - Gifted chat
 - Firebase (Googles cloudbased database) 
 - Firestore from firebase
+- useNetInfo
+- AsyncStorage
