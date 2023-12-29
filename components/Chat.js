@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Platform, KeyboardAvoidingView } from "react-native";
 import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 import {
   collection,
@@ -8,33 +8,13 @@ import {
   query,
   orderBy,
 } from "firebase/firestore";
-
+import MapView from "react-native-maps";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomActions from "./CustomActions";
 
-const Chat = ({ route, navigation, db, isConnected }) => {
+const Chat = ({ route, navigation, db, isConnected, storage }) => {
   const [messages, setMessages] = useState([]);
   const { name, backgroundColor, userID } = route.params;
-
-  const onSend = (newMessages) => {
-    addDoc(collection(db, "messages"), newMessages[0]);
-    // GiftedChat.append(previousMessages, newMessages)
-  };
-
-  const renderBubble = (props) => {
-    return (
-      <Bubble
-        {...props}
-        wrapperStyle={{
-          right: {
-            backgroundColor: "#2F4F4F",
-          },
-          left: {
-            backgroundColor: "#FFF8DC",
-          },
-        }}
-      />
-    );
-  };
 
   let unsubMessages;
 
@@ -63,9 +43,7 @@ const Chat = ({ route, navigation, db, isConnected }) => {
         cacheMessages(newMessages);
         setMessages(newMessages);
       });
-    } else {
-      loadCachedMessages();
-    }
+    } else loadCachedMessages();
 
     // Clean up code
     return () => {
@@ -74,24 +52,64 @@ const Chat = ({ route, navigation, db, isConnected }) => {
   }, [isConnected]);
 
   const loadCachedMessages = async () => {
-    const cacheMessages = (await AsyncStorage.getItem("message_list")) || [];
+    const cacheMessages = (await AsyncStorage.getItem("messages")) || [];
     setMessages(JSON.parse(cacheMessages));
   };
 
   const cacheMessages = async (messageToCache) => {
     try {
-      await AsyncStorage.setItem(
-        "message_list",
-        JSON.stringify(messageToCache)
-      );
+      await AsyncStorage.setItem("messages", JSON.stringify(messageToCache));
     } catch (error) {
       console.log(error.message);
     }
   };
 
+  const onSend = (newMessages) => {
+    addDoc(collection(db, "messages"), newMessages[0]);
+    // GiftedChat.append(previousMessages, newMessages)
+  };
+
+  const renderBubble = (props) => {
+    return (
+      <Bubble
+        {...props}
+        wrapperStyle={{
+          right: {
+            backgroundColor: "#2F4F4F",
+          },
+          left: {
+            backgroundColor: "#FFF8DC",
+          },
+        }}
+      />
+    );
+  };
+
   const renderInputToolbar = (props) => {
-    if (isConnected) return <InputToolbar {...props} />;
+    if (isConnected === true) return <InputToolbar {...props} />;
     else return null;
+  };
+
+  const renderCustomActions = (props) => {
+    return <CustomActions storage={storage} userID={userID} {...props} />;
+  };
+
+  const renderCustomView = (props) => {
+    const { currentMessage } = props;
+    if (currentMessage && currentMessage.location) {
+      return (
+        <MapView
+          style={{ width: 150, height: 100, borderRadius: 13, margin: 3 }}
+          region={{
+            latitude: currentMessage.location.latitude,
+            longitude: currentMessage.location.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+        />
+      );
+    }
+    return null;
   };
 
   return (
@@ -101,12 +119,17 @@ const Chat = ({ route, navigation, db, isConnected }) => {
         renderBubble={renderBubble}
         renderInputToolbar={renderInputToolbar}
         onSend={(messages) => onSend(messages)}
+        renderActions={renderCustomActions}
+        renderCustomView={renderCustomView}
         user={{
           _id: userID,
           username: name,
         }}
         key={Math.random()}
       />
+      {Platform.OS === "android" ? (
+        <KeyboardAvoidingView behavior="height" />
+      ) : null}
     </View>
   );
 };
