@@ -4,7 +4,6 @@ import Start from "./components/Start";
 import Chat from "./components/Chat";
 import React from "react";
 import { useNetInfo } from "@react-native-community/netinfo";
-import { StyleSheet, View } from "react-native";
 import { useEffect } from "react";
 import { Alert, LogBox } from "react-native";
 
@@ -85,11 +84,5 @@ const App = () => {
     // </View>
   );
 };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//   },
-// });
 
 export default App;
