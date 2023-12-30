@@ -7,12 +7,16 @@ A chat app for mobile devices using React Native. The app will provide users wit
 - The chat provide users with three additional communication features: sending images, taking photos and location data. 
 - Data gets stored online and offline.
 ### Screenshots
+![chat1](https://github.com/MSIlam/ChatFm/assets/43422503/c12d87fb-d3cb-42d5-a0f5-64a92c27d6f8)
 
-<p align="center">
-  <img src="./img/chat1.png" alt="First Image" style="width: 200px; height: auto; margin-right: 20px;">
-  <img src="./img/chat3.png" alt="Second Image" style="width: 200px; height: auto; margin-right: 20px;">
-  <img src="./img/chat4.png" alt="Second Image" style="width: 200px; height: auto;">
-</p>
+![chat3](https://github.com/MSIlam/ChatFm/assets/43422503/93ded01d-1b0e-471b-b13a-0e5f5b8ba4f7)
+
+![chat4](https://github.com/MSIlam/ChatFm/assets/43422503/cbcd7193-e702-404f-93ae-6ffa4ccd0918)
+
+<img src="https://github.com/MSIlam/ChatFm/assets/43422503/c12d87fb-d3cb-42d5-a0f5-64a92c27d6f8" width="400">
+<img src="https://github.com/MSIlam/ChatFm/assets/43422503/93ded01d-1b0e-471b-b13a-0e5f5b8ba4f7" width="400">
+<img src="https://github.com/MSIlam/ChatFm/assets/43422503/cbcd7193-e702-404f-93ae-6ffa4ccd0918" width="400">
+
 
 ## Tech tools
 - React native
